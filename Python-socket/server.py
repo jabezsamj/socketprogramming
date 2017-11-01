@@ -24,7 +24,7 @@ def handle_single_connection(socket, address):
             break
 
         elif data.startswith("HELO"):
-            socket.sendall("{0}\nIP:{1}\nPORT:{2}\nStudentID:{3}".format(data.strip(), "134.226.32.10", str(address[1]), "12326755"))
+            socket.sendall("{0}\nIP:{1}\nPort:{2}\nStudentID:{3}".format(data.strip(), "ec2-52-77-240-175.ap-southeast-1.compute.amazonaws.com", "4240", "17317151"))
             continue
 
         data = data.split('\n')
@@ -72,7 +72,8 @@ def broadcast(room_id, data):
 incoming_connections = Queue.Queue(maxsize=100)
 rooms = collections.OrderedDict()
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind(('localhost', 4240))
+ipadd = socket.gethostbyname(socket.gethostname())
+sock.bind((ipadd, 4240))
 sock.listen(5)
 
 while True:
