@@ -6,79 +6,79 @@ import Queue
 
 
 class ThreadHandler(threading.Thread):
-    def __init__(self, incoming_connections):
+    def __init__(self, connection_input):
         threading.Thread.__init__(self)
-        self.incoming_connections = incoming_connections
+        self.connection_input = connection_input
 
     def run(self):
         while True:
-            socket, address = self.incoming_connections.get()
-            handle_single_connection(socket, address)
-            self.incoming_connections.task_done()
+            socket, address = self.connection_input.get()
+            handle_chat_room(socket, address)
+            self.connection_input.task_done()
 
-def handle_single_connection(socket, address):
+def handle_chat_room(socket, address):
     while True:
-        data = socket.recv(2048).decode('utf-8')
-        if data.startswith("KILL_SERVICE"):
+        message = socket.recv(2048).decode('utf-8')
+        if message.startswith("KILL_SERVICE"):
             socket.close()
             break
 
-        elif data.startswith("HELO"):
-            socket.sendall("{0}\nIP:{1}\nPort:{2}\nStudentID:{3}".format(data.strip(), "ec2-52-77-240-175.ap-southeast-1.compute.amazonaws.com", "4240", "17317151"))
+        elif message.startswith("HELO"):
+            socket.sendall("{0}\nIP:{1}\nPort:{2}\nStudentID:{3}".format(message.strip(), "ec2-52-77-240-175.ap-southeast-1.compute.amazonaws.com", "4240", "17317151"))
             continue
 
-        data = data.split('\n')
-        action_key_value = data[0]
-        action_name = action_key_value[:action_key_value.find(':')]
-        if (action_name == 'CHAT'):
-            room_id = int(data[0].split(":")[1])
-            room_join_identifier = int(data[1].split(":")[1])
-            client_name = data[2].split(":")[1]
-            broadcast(room_id, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}\n\n".format(str(room_id), str(client_name), data[3].split(":")[1]))
-        elif (action_name == 'JOIN_CHATROOM'):
-            client_name = data[3].split(":")[1]
-            room_name = data[0].split(":")[1]
-            room_identifier = int(md5(room_name).hexdigest(), 16)
-            room_join_identifier = int(md5(client_name).hexdigest(), 16)
-            if room_identifier not in rooms:
-                rooms[room_identifier] = dict()
-            if room_join_identifier not in rooms[room_identifier]:
-                rooms[room_identifier][room_join_identifier] = socket
-                socket.sendall("JOINED_CHATROOM:{0}\nSERVER_IP:{1}\nPORT:{2}\nROOM_REF:{3}\nJOIN_ID:{4}\n".format(str(room_name), address[0], address[1], str(room_identifier), str(room_join_identifier)))
-                broadcast(room_identifier, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}".format(str(room_identifier), str(client_name), str(client_name) + " has joined this chatroom.\n\n"))
+        message = message.split('\n')
+        message_action_key = message[0]
+        message_action = message_action_key[:message_action_key.find(':')]
+        if (message_action == 'CHAT'):
+            chat_room_id = int(message[0].split(":")[1])
+            chat_room_join_identifier = int(message[1].split(":")[1])
+            client_name = message[2].split(":")[1]
+            broadcast(chat_room_id, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}\n\n".format(str(chat_room_id), str(client_name), message[3].split(":")[1]))
+        elif (message_action == 'JOIN_CHATROOM'):
+            client_name = message[3].split(":")[1]
+            chat_room_name = message[0].split(":")[1]
+            chat_room_identifier = int(md5(chat_room_name).hexdigest(), 16)
+            chat_room_join_identifier = int(md5(client_name).hexdigest(), 16)
+            if chat_room_identifier not in chat_rooms:
+                chat_rooms[chat_room_identifier] = dict()
+            if chat_room_join_identifier not in chat_rooms[chat_room_identifier]:
+                chat_rooms[chat_room_identifier][chat_room_join_identifier] = socket
+                socket.sendall("JOINED_CHATROOM:{0}\nSERVER_IP:{1}\nPORT:{2}\nROOM_REF:{3}\nJOIN_ID:{4}\n".format(str(chat_room_name), address[0], address[1], str(chat_room_identifier), str(chat_room_join_identifier)))
+                broadcast(chat_room_identifier, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}".format(str(chat_room_identifier), str(client_name), str(client_name) + " has joined this chatroom.\n\n"))
 
-        elif (action_name == 'LEAVE_CHATROOM'):
-            room_id = int(data[0].split(":")[1])
-            room_join_identifier = int(data[1].split(":")[1])
-            client_name = data[2].split(":")[1]
-            socket.sendall("LEFT_CHATROOM:{0}\nJOIN_ID:{1}\n".format(str(room_id), str(room_join_identifier)))
-            broadcast(room_id, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}\n\n".format(str(room_id), str(client_name), str(client_name) + " has left this chatroom."))
-            del rooms[room_id][room_join_identifier]
+        elif (message_action == 'LEAVE_CHATROOM'):
+            chat_room_id = int(message[0].split(":")[1])
+            chat_room_join_identifier = int(message[1].split(":")[1])
+            client_name = message[2].split(":")[1]
+            socket.sendall("LEFT_CHATROOM:{0}\nJOIN_ID:{1}\n".format(str(chat_room_id), str(chat_room_join_identifier)))
+            broadcast(chat_room_id, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}\n\n".format(str(chat_room_id), str(client_name), str(client_name) + " has left this chatroom."))
+            del chat_rooms[chat_room_id][chat_room_join_identifier]
 
-        elif (action_name == 'DISCONNECT'):
-            client_name = data[2].split(":")[1]
-            room_join_identifier = int(md5(client_name).hexdigest(), 16)
-            for room_id in rooms.keys():
-                if room_join_identifier in rooms[room_id]:
-                    broadcast(room_id, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}\n\n".format(str(room_id), str(client_name), str(client_name) + " has left this chatroom."))
-                    if room_join_identifier in rooms[room_id]:
-                        del rooms[room_id][room_join_identifier]
+        elif (message_action == 'DISCONNECT'):
+            client_name = message[2].split(":")[1]
+            chat_room_join_identifier = int(md5(client_name).hexdigest(), 16)
+            for chat_room_id in chat_rooms.keys():
+                if chat_room_join_identifier in chat_rooms[chat_room_id]:
+                    broadcast(chat_room_id, "CHAT:{0}\nCLIENT_NAME:{1}\nMESSAGE:{2}\n\n".format(str(chat_room_id), str(client_name), str(client_name) + " has left this chatroom."))
+                    if chat_room_join_identifier in chat_rooms[chat_room_id]:
+                        del chat_rooms[chat_room_id][chat_room_join_identifier]
             break
 
-def broadcast(room_id, data):
-    for room_join_identifier, connection in rooms[room_id].iteritems():
+def broadcast(chat_room_id, data):
+    for room_join_identifier, connection in chat_rooms[chat_room_id].iteritems():
         connection.sendall(data)
 
-incoming_connections = Queue.Queue(maxsize=100)
-rooms = collections.OrderedDict()
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ipadd = socket.gethostbyname(socket.gethostname())
-sock.bind((ipadd, 4240))
-sock.listen(5)
+connection_pool = Queue.Queue(maxsize=100)
+chat_rooms = collections.OrderedDict()
+serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+ipaddress = socket.gethostbyname(socket.gethostname())
+serv_sock.bind((ipaddress, 4240))
+serv_sock.listen(5)
 
 while True:
-    connection, address = sock.accept()
-    connection_handler = ThreadHandler(incoming_connections)
-    connection_handler.setDaemon(True)
-    connection_handler.start()
-    incoming_connections.put((connection, address))
+    connection, address = serv_sock.accept()
+    handle_connection = ThreadHandler(connection_pool)
+    handle_connection.setDaemon(True)
+    handle_connection.start()
+    connection_pool.put((connection, address))
