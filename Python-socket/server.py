@@ -3,6 +3,7 @@ from hashlib import md5
 import collections
 import socket
 import Queue
+import sys
 
 
 class ThreadHandler(threading.Thread):
@@ -24,7 +25,7 @@ def handle_chat_room(socket, address):
             break
 
         elif message.startswith("HELO"):
-            socket.sendall("{0}\nIP:{1}\nPort:{2}\nStudentID:{3}".format(message.strip(), "ec2-52-77-240-175.ap-southeast-1.compute.amazonaws.com", "4240", "17317151"))
+            socket.sendall("{0}\nIP:{1}\nPort:{2}\nStudentID:{3}".format(message.strip(), ipaddress, port_num, student_num))
             continue
 
         message = message.split('\n')
@@ -69,11 +70,14 @@ def broadcast(chat_room_id, data):
     for room_join_identifier, connection in chat_rooms[chat_room_id].iteritems():
         connection.sendall(data)
 
+
+ipaddress = socket.gethostbyname(socket.gethostname())
+port_num = int(sys.argv[1])
+student_num = 17317151
 connection_pool = Queue.Queue(maxsize=100)
 chat_rooms = collections.OrderedDict()
 serv_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-ipaddress = socket.gethostbyname(socket.gethostname())
-serv_sock.bind((ipaddress, 4240))
+serv_sock.bind((ipaddress, port_num))
 serv_sock.listen(5)
 
 while True:
@@ -82,3 +86,7 @@ while True:
     handle_connection.setDaemon(True)
     handle_connection.start()
     connection_pool.put((connection, address))
+
+
+
+
