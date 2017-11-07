@@ -1,6 +1,6 @@
 
 
-The code is written in Python. The code is in the folder: Python-socket
+The code is written in Python. 
 
 ------- Setup -------------
 
