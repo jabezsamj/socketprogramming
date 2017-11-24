@@ -94,6 +94,8 @@ and the following commits
          - Removed the Java folder and Haskell folders
          - Added two read me files, one in the root and one inside the python folder
 
+         - Now the code passed the test with score 102
+
 
 Nov 23
 commit : e616ca4d470a0d4b0781dd8d02fcc1125c14ebd5
