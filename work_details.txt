@@ -1,0 +1,111 @@
+
+The work details of each commit are explained here:
+
+
+Oct 7    
+commit : 501faeb687f58db0091c850697006722caf21a00
+         0df9b8747dbc0a0fbe8c3a872d12cc702d710a64
+         3013687e8bc47a7d37ad6f699bfb198f83a5b2a5
+
+
+         Tested the repository with a read me file
+
+
+Oct 7
+commit : ac62910f8511635b388a4c51f0d6a7da57b43bf2
+
+         Committed a simple ChatApp based on Java
+         Client and Server communicating using Socket 
+
+
+Oct 16
+commit : 769b156b92742646f9e4992afcb582020d9fbd46
+
+         Java based multithreaded chat room
+         Source: Github- https://github.com/nstebbins/multithreaded-chatroom
+         The server had chatrooms handled with hash map.
+         The features were sophisticated, more than what was expected for the exercise
+
+
+Oct 21 
+Commit : 46c99bae0c118ee47cf43153f75dc99923561027
+        
+         Added the Haskell code.
+         Hosted it on AWS, and tested it from the test server.
+         Th test server could establish the basic connection, first test case was passing
+
+
+Oct 31
+Commit : d6a12040fac2130b23d64d773b639716f8417854
+
+         Added the python folder
+         Moved to python as python after realising that socket programming gets 
+         can be established easily in python.
+         Tested the code from local clients.
+         Hosted it on AWS, tested the machine and found the the test server cleared with 96 pass
+
+         Added the below files to the repository:
+         
+         chatroom.py
+         client.py
+         server.py
+         worker.py
+         worker_pool.py
+
+
+         All the files other than the server.py was used to build up the system.
+         The server.py contains the integrated code.
+         
+         worker.py - Handling the incoming conections with threads
+                     covers starting service, ending service, joining and leaving chat rooms, uses chatroom class
+
+         chatroom.py - A map is maintained for each of the clients joining
+
+         workerpool.py - To handle the incoming connections with a thread pool
+
+         cleint.py - To test the connection, getting input from the command line
+
+
+         Server.py - Consolidated code. Each of the cient is stored in a dictionary. Incoming connections are handled in a queue.
+         The server handles all the functionalities
+
+
+Nov 1
+commit : fd70371e34b8842b5f4bfafb8fa7db0231d75cbf
+
+         Added the compile.h file
+         Changed the hard coded ip address to get the ip address of the hosted system
+
+         Hosted on to Nebula, the test was passing with score 98
+
+Nov 3
+commit : 569ca859f4d18b809f24f5239527ab99373467ce
+
+         Deleted the extra files.
+         Changed the variable names in server.py
+
+
+Nov 7
+commit : 6beb0e05ba8f2f4f1154db10cfaa1fd0f3cc9c10
+and the following commits
+         
+         - Added code in server.py to get the port number from the command line
+         - Deleted the contents in compile.sh added start.sh to run the python file and to get the port number along the run command
+         - Removed the Java folder and Haskell folders
+         - Added two read me files, one in the root and one inside the python folder
+
+
+Nov 23
+commit : e616ca4d470a0d4b0781dd8d02fcc1125c14ebd5
+commit : 5bce7ada023ae744dbf87605787c6712b935b0e7
+
+         Added Java code to the repository by mistake and then removed it 
+
+
+Nov 24
+
+    Added this work history file
+    Added details in the read me file
+
+
+

@@ -13,3 +13,10 @@ The code is written in Python. The code is in the folder: Python-socket
 
 
 ----------------------------
+
+
+---- Work history ----------
+
+   The commits based work details are in the file work_details.txt
+
+----------------------------
